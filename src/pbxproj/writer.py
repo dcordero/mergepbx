@@ -3,9 +3,7 @@ import re
 
 SPECIAL_CHARS = ("\\\"")
 def escape_string(s):
-    for character in SPECIAL_CHARS:
-        s = s.replace(character, "\\" + character)
-    return s
+    return '"%s"' % repr(s)[1:-1].replace('"',r'\"').replace(r"\'","'")
 
 class IndentWriter(object):
     ONLY_SPACES_RE = re.compile(r"\A\s+\Z")
@@ -71,13 +69,13 @@ class PlistWriter(IndentWriter):
             else:
                 self.write_set(value)
         else:
-            self.write_string(unicode(value, self.codec))
+            self.write_string(value)
 
     def write_string(self, string):
         if PlistWriter.IDENTIFIER_RE.match(string):
             self.write(string)
         else:
-            self.write((u"\"%s\"" % escape_string(string)))
+	    self.write(escape_string(string))
 
     def write_dict_multiline(self, dict, comments = {}):
         self.write(u"{")
