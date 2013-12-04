@@ -19,9 +19,9 @@ class PBXProjFile(DictionaryBoundObject):
         )
 
         for (section, phase_isa) in phases:
-            phase_object = self._objects.getobject(phase_isa)
-            if not phase_object is None:
-                self._phases[section] = set(phase_object.files)
+            phase_object_files = self._objects.getfiles(phase_isa)
+            if not phase_object_files is None:
+                self._phases[section] = set(phase_object_files)
 
     def get_objects(self):
         return self._objects
@@ -60,11 +60,13 @@ class PBXObjects(object):
     def getobjects(self, isa=None):
         return tuple(self.iterobjects(isa))
 
-    def getobject(self, isa):
+    def getfiles(self,isa):
         found_objects = self.getobjects(isa)
-
-        if len(found_objects) >= 1:
-            return self.getobjects(isa)[0][1]
+        if len(found_objects) > 0:
+	    objectFiles = list ();
+	    for isaElement in self.getobjects(isa):
+	        objectFiles.extend (isaElement[1].files)
+            return objectFiles
         else:
             return None
 
